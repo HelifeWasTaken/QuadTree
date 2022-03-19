@@ -36,16 +36,22 @@
 //
 // The T type should be safely copyable and as Light as possible
 //
+//
+//
+
+#include <memory>
+#include <vector>
+#include <array>
 
 template <typename T>
 class QuadTree {
  public:
-  using QuadTreeRectangleList<T> = std::vector<std::unique_ptr<T>>;
-  using QuadTreeList<T> = std::array<std::unique_ptr<QuadTree<T>>, 4>;
+  using QuadTreeRectangleList = std::vector<std::unique_ptr<T>>;
+  using QuadTreeList = std::array<std::unique_ptr<QuadTree<T>>, 4>;
 
  private:
-  QuadTreeList<T> _trees;
-  QuadTreeRectangleList<T> _rects;
+  QuadTreeList _trees;
+  QuadTreeRectangleList _rects;
   T _bounds;
   unsigned int _level;
   unsigned int _maxRect;
@@ -71,7 +77,7 @@ class QuadTree {
     const auto x = _bounds.getX();
     const auto y = _bounds.getY();
 
-    const T std::array<T, 4> rects = {
+    const std::array<T, 4> rects = {
         T(x + divWidth, y, divWidth, divHeight), T(x, y, divWidth, divHeight),
         T(x, y + divHeight, divWidth, divHeight),
         T(x + divWidth, y + divHeight, divWidth, divHeight)};
@@ -81,7 +87,7 @@ class QuadTree {
                                                    _maxLevel, _level + 1);
   }
 
-  void _getPossibleCollisions(QuadTreeRectangleList<T> &rectangles,
+  void _getPossibleCollisions(QuadTreeRectangleList &rectangles,
                               const T &rect) const {
     const int index = findRectanglePosition(rect);
     if (index != -1 && _trees.at(0).get() != nullptr)
@@ -135,7 +141,7 @@ class QuadTree {
     }
   }
 
-  void getPossibleCollisions(QuadTreeRectangleList<T> &rectangles,
+  void getPossibleCollisions(QuadTreeRectangleList &rectangles,
                              const T &rect, bool clear = true) const {
     if (clear) rectangles.clear();
     _getPossibleCollisions(rectangles, rect);
