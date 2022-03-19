@@ -86,7 +86,8 @@ class QuadTree {
     const int index = findRectanglePosition(rect);
     if (index != -1 && _trees.at(0).get() != nullptr)
       _trees.at(index)->_getPossibleCollisions(rectangles, rect);
-    for (const auto &it : _rects) rectangles.push_back(*it);
+    for (const auto &it : _rects)
+      rectangles.push_back(std::make_unique<T>(**it));
   }
 
   QuadTree(const T &bounds, unsigned int maxRect, unsigned int maxLevel,
@@ -113,22 +114,22 @@ class QuadTree {
 
   void insert(const T &nRect) {
     if (_trees.at(0).get() != nullptr) {
-      int index = findRectanglePosition(nRect);
+      const int index = findRectanglePosition(nRect);
       if (index == -1) {
         _trees.at(index)->insert(nRect);
         return;
       }
     }
-    _rects.push_back(nRect);
+    _rects.push_back(std::make_unique<T>(nRect));
     if (_rects.size() >= _maxRect && _level < _maxLevel) {
       if (_trees.at(0).get() == nullptr) split();
     }
     for (unsigned int i = 0; i < _rects.size();) {
-      int index = findRectanglePosition(nRect);
+      const int index = findRectanglePosition(nRect);
       if (index == -1) {
         i++;
       } else {
-        _trees.at(index)->insert(_rects.at(i));
+        _trees.at(index)->insert(*_rects.at(i));
         _rects.erase(_rects.begin() + i);
       }
     }
